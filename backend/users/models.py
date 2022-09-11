@@ -46,7 +46,7 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
         constraints = [
             models.UniqueConstraint(
-                fields=["email", "username"],
+                fields=['email', 'username'],
                 name="unique_auth"
             ),
         ]

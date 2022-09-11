@@ -1,20 +1,24 @@
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework import viewsets, status, filters
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
 from django.db.models import Sum
-from rest_framework.permissions import AllowAny, SAFE_METHODS
-from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
+from rest_framework.response import Response
 
-from users.models import User, Follow
-from recipes.models import Tag, Ingredient, IngredientAmount, Recipe, FavoriteRecipe, ShoppingList
-from .serializers import FavoriteRecipeSerializer, RecipeSerializers, RecipeWriteSerializer, UserSerializer, FollowSerializer, TagSerializer, IngredientSerializer, IngredientAmountSerializer
-from .permissions import AdminUserOrReadOnly
-from .pagination import LimitPageNumberPagination
+from recipes.models import (FavoriteRecipe, Ingredient, IngredientAmount, 
+                            Recipe, ShoppingList, Tag)
+from users.models import Follow, User
+from .filters import IngredientFilter, RecipeFilter
 from .mixins import ListRetrieveViewSet
-from .filters import RecipeFilter, IngredientFilter
+from .pagination import LimitPageNumberPagination
+from .permissions import AdminUserOrReadOnly
+from .services import create_shopping_list
+
+from .serializers import (FavoriteRecipeSerializer, FollowSerializer, 
+                        IngredientAmountSerializer, IngredientSerializer, 
+                        RecipeSerializers, RecipeWriteSerializer, 
+                        TagSerializer, UserSerializer)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -133,6 +137,7 @@ class IngredientAmountViewSet(viewsets.ModelViewSet):
     queryset = IngredientAmount.objects.all()
     serializer_class = IngredientAmountSerializer
 
+
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
@@ -227,14 +232,5 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredients__name',
             'ingredients__measurement_unit').order_by(
             'ingredients__name').annotate(total=Sum('amount'))
-        shoping_cart = {}
-        for ingredient in ingredients:
-            name = ingredient['ingredients__name']
-            amount = f'{ingredient["total"]} {ingredient["ingredients__measurement_unit"]}'
-            shoping_cart[name] = amount
-        data = ''
-        for key, value in shoping_cart.items():
-            data += f'{key} - {value}\n'
-        response = HttpResponse(data, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
+        response = create_shopping_list(ingredients)
         return response

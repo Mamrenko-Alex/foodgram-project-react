@@ -1,6 +1,6 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.html import format_html
-from django.core.validators import MinValueValidator
 
 from users.models import User
 
@@ -52,13 +52,11 @@ class Recipe(models.Model):
     name = models.CharField(
         verbose_name='Название',
         max_length=200,
-        default='Some string',
-        blank=True
+        default='Some string'
     )
     text = models.TextField(
         verbose_name='Описание рецепта',
-        help_text='Опишите, как можно подробнее, этапы приготовления',
-        blank=True
+        help_text='Опишите, как можно подробнее, этапы приготовления'
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -73,26 +71,22 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Теги',
-        related_name='recieps',
-        blank=True
+        related_name='recieps'
     )
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientAmount',
         verbose_name='Ингридиенты',
-        related_name='recipes',
-        blank=True
+        related_name='recipes'
     )
     image = models.ImageField(
         verbose_name='Картинка',
         help_text='Добавьте изображиние',
-        upload_to='recipes/images/',
-        blank=True
+        upload_to='recipes/images/'
     )
     cooking_time = models.IntegerField(
         default=1,
         verbose_name='Время приготовления',
-        blank=True,
         validators=[
             MinValueValidator(
                 1,
@@ -109,6 +103,12 @@ class Recipe(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    def list_tags(self):
+        return self.tags.values_list('name', flat=True)
+    
+    def list_ingredients(self):
+        return self.ingredients.all()
+
 
 class IngredientAmount(models.Model):
     recipe = models.ForeignKey(
@@ -122,6 +122,7 @@ class IngredientAmount(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Ингредиенты',
         related_name='recipe',
+        null=True
     )
     amount = models.IntegerField(
         default=1,
@@ -136,9 +137,9 @@ class IngredientAmount(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Количество ингридиента'
-        verbose_name_plural = 'Количество ингридиентов'
-        ordering = ['-id', ]
+        verbose_name = 'Ингредиенты в рецептах'
+        verbose_name_plural = 'Ингредиенты в рецептах'
+        ordering = ['id', ]
         constraints = [
             models.UniqueConstraint(fields=[
                 'recipe', 'ingredients'],
@@ -146,8 +147,7 @@ class IngredientAmount(models.Model):
         ]
 
     def __str__(self) -> str:
-        return (f'{self.ingredients.name} - '
-                f'{self.amount}{self.ingredients.measurement_unit}')
+        return (f'{self.recipe.name} - {self.ingredients.name}')
 
 
 
