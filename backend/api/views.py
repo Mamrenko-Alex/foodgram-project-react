@@ -16,9 +16,9 @@ from .permissions import AdminUserOrReadOnly
 from .services import create_shopping_list
 
 from .serializers import (FavoriteRecipeSerializer, FollowSerializer,
-                         IngredientAmountSerializer, IngredientSerializer,
-                         RecipeSerializers, RecipeWriteSerializer,
-                         TagSerializer, UserSerializer)
+                          IngredientAmountSerializer, IngredientSerializer,
+                          RecipeSerializers, RecipeWriteSerializer,
+                          TagSerializer, UserSerializer)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -79,29 +79,29 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             if user is author:
                 return Response(
-                    {'errors' : 'Вы не можете подписаться на себя.'},
+                    {'errors': 'Вы не можете подписаться на себя.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             follow = Follow.objects.filter(user=user, author=author)
             if follow.exists():
                 return Response(
-                    {'error' : 'Вы уже подписаны на этого пользователя.'},
+                    {'error': 'Вы уже подписаны на этого пользователя.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             follow = Follow.objects.create(user=user, author=author)
             serializers = FollowSerializer(
-                follow, context={'request' : request})
+                follow, context={'request': request})
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             if user is author:
                 return Response(
-                    {'errors' : 'Вы не можете отписаться от самого себя.'},
+                    {'errors': 'Вы не можете отписаться от самого себя.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             follow = Follow.objects.filter(user=user, author=author)
             if not follow.exists():
                 return Response(
-                    {'error' : 'Вы не подписаны на этого пользователя.'},
+                    {'error': 'Вы не подписаны на этого пользователя.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             follow.delete()
@@ -171,18 +171,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             if favorited.exists():
                 return Response(
-                    {'error' : 'Вы уже добавили рецепт в избранное.'},
+                    {'error': 'Вы уже добавили рецепт в избранное.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             favorited = FavoriteRecipe.objects.create(
                 user=user, recipe=recipe)
             serializers = FavoriteRecipeSerializer(
-                recipe, context={'request' : request})
+                recipe, context={'request': request})
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             if not favorited.exists():
                 return Response(
-                    {'error' : 'Этого рецепта не в вашем списке избраного.'},
+                    {'error': 'Этого рецепта не в вашем списке избраного.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             favorited.delete()
@@ -203,18 +203,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             if in_shopping.exists():
                 return Response(
-                    {'error' : 'Вы уже добавили рецепт в список покупок.'},
+                    {'error': 'Вы уже добавили рецепт в список покупок.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             in_shopping = ShoppingList.objects.create(
                 user=user, recipe=recipe)
             serializers = FavoriteRecipeSerializer(
-                recipe, context={'request' : request})
+                recipe, context={'request': request})
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             if not in_shopping.exists():
                 return Response(
-                    {'error' : 'У вас нет этого рецепта в списоке покупок.'},
+                    {'error': 'У вас нет этого рецепта в списоке покупок.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             in_shopping.delete()

@@ -31,7 +31,8 @@ class UserSerializer(UserCreateSerializer):
         if user.is_anonymous:
             return False
         followings = Follow.objects.filter(
-                    user=user, author=obj)
+            user=user, author=obj
+        )
         return followings.exists()
 
 
@@ -101,7 +102,8 @@ class RecipeSerializers(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         favorite = FavoriteRecipe.objects.filter(
-                    user=user, recipe=obj)
+            user=user, recipe=obj
+        )
         return favorite.exists()
 
     def get_is_in_shopping_cart(self, obj):
@@ -109,7 +111,8 @@ class RecipeSerializers(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         favorite = ShoppingList.objects.filter(
-                    user=user, recipe=obj)
+            user=user, recipe=obj
+        )
         return favorite.exists()
 
 
@@ -243,7 +246,7 @@ class FollowSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.IntegerField(
-        source='author.recipes.count', 
+        source='author.recipes.count',
         read_only=True
     )
 
@@ -262,7 +265,8 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         followings = Follow.objects.filter(
-                    user=obj.user, author=obj.author)
+            user=obj.user, author=obj.author
+        )
         return followings.exists()
 
     def get_recipes(self, obj):
