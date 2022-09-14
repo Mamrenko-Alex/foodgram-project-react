@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 
-from recipes.models import (FavoriteRecipe, Ingredient, IngredientAmount, 
+from recipes.models import (FavoriteRecipe, Ingredient, IngredientAmount,
                             Recipe, ShoppingList, Tag)
 from users.models import Follow, User
 from .filters import IngredientFilter, RecipeFilter
@@ -15,10 +15,10 @@ from .pagination import LimitPageNumberPagination
 from .permissions import AdminUserOrReadOnly
 from .services import create_shopping_list
 
-from .serializers import (FavoriteRecipeSerializer, FollowSerializer, 
-                        IngredientAmountSerializer, IngredientSerializer, 
-                        RecipeSerializers, RecipeWriteSerializer, 
-                        TagSerializer, UserSerializer)
+from .serializers import (FavoriteRecipeSerializer, FollowSerializer,
+                         IngredientAmountSerializer, IngredientSerializer,
+                         RecipeSerializers, RecipeWriteSerializer,
+                         TagSerializer, UserSerializer)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -79,34 +79,35 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             if user is author:
                 return Response(
-                    {'errors':'Вы не можете подписаться на себя.'},
+                    {'errors' : 'Вы не можете подписаться на себя.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             follow = Follow.objects.filter(user=user, author=author)
             if follow.exists():
                 return Response(
-                    {'error':'Вы уже подписаны на этого пользователя.'},
+                    {'error' : 'Вы уже подписаны на этого пользователя.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             follow = Follow.objects.create(user=user, author=author)
-            serializers = FollowSerializer(follow, context={'request':request})
+            serializers = FollowSerializer(
+                follow, context={'request' : request})
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             if user is author:
                 return Response(
-                    {'errors':'Вы не можете отписаться от самого себя.'},
+                    {'errors' : 'Вы не можете отписаться от самого себя.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             follow = Follow.objects.filter(user=user, author=author)
             if not follow.exists():
                 return Response(
-                    {'error':'Вы не подписаны на этого пользователя.'},
+                    {'error' : 'Вы не подписаны на этого пользователя.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             follow.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    
+
     @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
@@ -155,7 +156,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
-    
+
     @action(
         detail=True,
         methods=['post', 'delete'],
@@ -170,17 +171,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             if favorited.exists():
                 return Response(
-                    {'error':'Вы уже добавили рецепт в избранное.'},
+                    {'error' : 'Вы уже добавили рецепт в избранное.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             favorited = FavoriteRecipe.objects.create(
                 user=user, recipe=recipe)
-            serializers = FavoriteRecipeSerializer(recipe, context={'request':request})
+            serializers = FavoriteRecipeSerializer(
+                recipe, context={'request' : request})
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             if not favorited.exists():
                 return Response(
-                    {'error':'Этого рецепта не в вашем списке избраного.'},
+                    {'error' : 'Этого рецепта не в вашем списке избраного.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             favorited.delete()
@@ -201,17 +203,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             if in_shopping.exists():
                 return Response(
-                    {'error':'Вы уже добавили рецепт в список покупок.'},
+                    {'error' : 'Вы уже добавили рецепт в список покупок.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             in_shopping = ShoppingList.objects.create(
                 user=user, recipe=recipe)
-            serializers = FavoriteRecipeSerializer(recipe, context={'request':request})
+            serializers = FavoriteRecipeSerializer(
+                recipe, context={'request' : request})
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             if not in_shopping.exists():
                 return Response(
-                    {'error':'У вас нет этого рецепта в списоке покупок.'},
+                    {'error' : 'У вас нет этого рецепта в списоке покупок.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             in_shopping.delete()
@@ -232,5 +235,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredients__name',
             'ingredients__measurement_unit').order_by(
             'ingredients__name').annotate(total=Sum('amount'))
-        response = create_shopping_list(ingredients)
-        return response
+        return create_shopping_list(ingredients)

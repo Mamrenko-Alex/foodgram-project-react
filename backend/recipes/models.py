@@ -16,7 +16,7 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def colored_name(self):
         return format_html(
             '<span style="color: #{};">{}</span>',
@@ -26,7 +26,7 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(
-        verbose_name = 'Название ингридиента',
+        verbose_name='Название ингридиента',
         max_length=200
     )
     measurement_unit = models.CharField(
@@ -99,13 +99,13 @@ class Recipe(models.Model):
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         ordering = ['-pub_date', ]
-    
+
     def __str__(self) -> str:
         return self.name
 
     def list_tags(self):
         return self.tags.values_list('name', flat=True)
-    
+
     def list_ingredients(self):
         return self.ingredients.all()
 
@@ -131,7 +131,7 @@ class IngredientAmount(models.Model):
             MinValueValidator(
                 1,
                 ('Минимальное количество для каждого '
-                'ингридиента 1, независимо от единицы измерения')
+                 'ингридиента 1, независимо от единицы измерения')
             )
         ]
     )
@@ -148,7 +148,6 @@ class IngredientAmount(models.Model):
 
     def __str__(self) -> str:
         return (f'{self.recipe.name} - {self.ingredients.name}')
-
 
 
 class FavoriteRecipe(models.Model):
@@ -198,10 +197,10 @@ class ShoppingList(models.Model):
         verbose_name_plural = 'Список покупок'
         ordering = ['-id', ]
         constraints = [
-            models.UniqueConstraint(fields=[
-                'user', 'recipe'], 
+            models.UniqueConstraint(
+                fields=['user', 'recipe'], 
                 name='unique_shoping_list_user')
         ]
-    
+
     def __str__(self) -> str:
         return (f'{self.recipe.name}')

@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from .models import (FavoriteRecipe, Ingredient, 
-                    IngredientAmount, Recipe, 
-                    ShoppingList, Tag)
+from .models import (FavoriteRecipe, Ingredient,
+                     IngredientAmount, Recipe,
+                     ShoppingList, Tag)
 
 
 class IngredientInline(admin.TabularInline):
@@ -23,12 +23,12 @@ class IngredintAdmin(admin.ModelAdmin):
 class IngredientAmountAdmin(admin.ModelAdmin):
     list_display = ('recipe', 'ingredients', 'amount')
     list_filter = ('recipe', 'ingredients')
-    
+
 
 class FavoriteRecipeAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')
     list_filter = ('user', 'recipe')
-    search_fields = ('users','recipe')
+    search_fields = ('users', 'recipe')
 
 
 class ShoppingListAdmin(admin.ModelAdmin):
@@ -39,7 +39,7 @@ class ShoppingListAdmin(admin.ModelAdmin):
 
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 
+        'name',
         'text',
         'pub_date',
         'author',
@@ -59,13 +59,13 @@ class RecipeAdmin(admin.ModelAdmin):
         if tags_set:
             return list(tags_set)
         return None
-    
+
     def count_favorites(self, obj):
         queriset = obj.favorites.count()
         if queriset:
             return queriset
         return None
-    
+
     def get_ingredients(self, obj):
         ingredients_set = obj.list_ingredients()
         if ingredients_set:

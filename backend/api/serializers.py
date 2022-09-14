@@ -1,8 +1,8 @@
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
-from recipes.models import (FavoriteRecipe, Ingredient, 
-                            IngredientAmount, Recipe, 
+from recipes.models import (FavoriteRecipe, Ingredient,
+                            IngredientAmount, Recipe,
                             ShoppingList, Tag)
 from users.models import User, Follow
 from .imagefield import ImageConversion
@@ -40,7 +40,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields= ['id', 'name', 'color', 'slug']
+        fields = ['id', 'name', 'color', 'slug']
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -146,7 +146,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         ingredients = data.get('ingredients')
         ingredients_id = []
         for ingredient in ingredients:
-            if  not isinstance(ingredient.get('amount'), int):
+            if not isinstance(ingredient.get('amount'), int):
                 raise serializers.ValidationError(
                     'Значение количество ингредиента (amount) '
                     'должно быть числом. Проверьте и укажите '
@@ -188,7 +188,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
-        tags =  validated_data.pop('tags')
+        tags = validated_data.pop('tags')
         author = validated_data.get('author')
         name = validated_data.get('name')
         recipe = Recipe.objects.filter(author=author, name=name)
@@ -204,7 +204,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             ingredients=ingredients,
             tags=tags
         )
-    
+
     def update(self, instance, validated_data):
         instance.cooking_time = validated_data.get(
             'cooking_time', instance.cooking_time
@@ -243,8 +243,8 @@ class FollowSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.IntegerField(
-            source='author.recipes.count', 
-            read_only=True
+        source='author.recipes.count', 
+        read_only=True
     )
 
     class Meta:

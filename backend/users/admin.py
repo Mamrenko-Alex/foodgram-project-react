@@ -23,5 +23,6 @@ class FollowAdmin(admin.ModelAdmin):
     list_filter = ('user', 'author')
     search_fields = ('user', 'author')
 
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Follow, FollowAdmin)

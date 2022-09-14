@@ -6,10 +6,12 @@ class UserRole:
     USER = 'user'
     ADMIN = 'admin'
 
+
 ROLES = (
     (UserRole.USER, UserRole.USER),
     (UserRole.ADMIN, UserRole.ADMIN)
 )
+
 
 class User(AbstractUser):
     email = models.EmailField(
@@ -61,6 +63,7 @@ class User(AbstractUser):
             or self.is_staff
             or self.is_superuser
         )
+
 
 class Follow(models.Model):
     user = models.ForeignKey(
