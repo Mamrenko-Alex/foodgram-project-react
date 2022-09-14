@@ -198,7 +198,7 @@ class ShoppingList(models.Model):
         ordering = ['-id', ]
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'], 
+                fields=['user', 'recipe'],
                 name='unique_shoping_list_user')
         ]
 
